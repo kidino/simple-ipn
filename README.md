@@ -1,24 +1,7 @@
-SIMPLE IPN SCRIPT
-=================
-Created By: Iszuddin Ismail
-Website: http://www.minisitegallery.com/blog/simple-ipn.html
-Version: 1.2
+SIMPLE IPN
+==========
 
-TWITTER: http://twitter.com/iszuddin -- FOLLOW ME
-FACEBOOK: http://facebook.com/iszuddin
-
-
-THE MOTIVATION & THE STORY
-==========================
-
-I was running a class for my Netpreneurs Online Classroom
-and we got to the part where we are suppose to learn how
-to deliver our downloadble digital products.
-
-I don't want to make this complicated for my students. I
-want to make this simple, but at the same time offers some
-form security from online thefts. So I started thinking of
-a simple script that should be able to do the following:
+Some features:
 
 [+] Expiring download link
 
