@@ -1,0 +1,27 @@
+#wrapper {
+	width: 500px;
+	padding: 20px;
+	border: 1px solid #ccc;
+	margin: auto;
+}
+
+ul#dlist {
+	list-style-type: square;
+}
+
+ul#dlist li {
+	font-family: Arial;
+	font-size: 11pt;
+	position: relative;
+	padding-bottom: 25px;
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+
+ul#dlist li small {
+	position: absolute;
+	left: 300px;
+	top: 0px;
+	font-size: 8pt;
+	font-weight: normal;
+}

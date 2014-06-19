@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>Download Page for {PRODUCT NAME}</title>
+<LINK href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="wrapper">
+	<h1>Download Page for {PRODUCT NAME}</h1>
+	<p>Dear {CUSTOMER NAME},</p>
+	<p>Thank you for purchasing {PRODUCT NAME}. Below are the purchase details:</p>
+	<blockquote>
+		<p><strong>Product Name:</strong> {PRODUCT NAME}</p>
+		<p><strong>Purchased Price:</strong> ${PRODUCT PRICE}</p>
+		<p><strong>Transaction ID:</strong> {PAYPAL TXN ID}</p>
+		<p><strong>Purchase Date:</strong> {PAYPAL PURCHASE DATE}</p>
+		<p><strong>Download Time Limit:</strong> {DOWNLOAD TIME} hours</p>
+		<p><strong>Download Time Left:</strong> {DOWNLOAD TIME LEFT} hours</p>
+	</blockquote>
+	<p>Below are the download links to the files in the product.</p>
+	{DOWNLOADS1|I am sorry but your download time has expired!}
+<!--
+	OTHER DOWNLOAD STYLES YOU CAN USE.
+	UNCOMMENT AND MAKE CHANGES AS NEEDED.
+
+	<p>Here's an alternative download style.</p>
+	{DOWNLOADS2|I am sorry but your download time has expired!}
+	{DOWNLOADS1}
+	{DOWNLOADS2}
+	<p>Should you need any assistance with the downloads or with the product, you
+	can email {SUPPORT EMAIL ADDRESS}</p>
+-->
+</div>
+</body>
+</html>
+
+<!--
+AVAILABLE VARIABLES FOR YOUR DOWNLOAD PAGE TEMPLATES
+
+{CUSTOMER NAME}
+{CUSTOMER PAYPAL EMAL}
+{CUSTOMER BUSINESS NAME}
+{PAYPAL TXN ID}
+{PAYPAL PURCHASE DATE}
+{DOWNLOAD PAGE URL}
+
+{PRODUCT NAME}
+{PRODUCT PRICE}
+
+{DOWNLOAD TIME}
+{DOWNLOAD TIME LEFT}
+
+{SUPPORT EMAIL ADDRESS}
+
+{DOWNLOADS1|expired message}
+{DOWNLOADS2|expired message}
+
+{DOWNLOAD TIME}
+{DOWNLOAD TIME LEFT}
+
+-->
