@@ -6,8 +6,8 @@ $debug = 1;  // to enable debug mode. debug mode will dump IPN data and transact
              
 $paypal_sandbox = 1;  // 1 for test more, 0 for production mode
 $expire_in_hours = 72;  // how many hours before download expires, in hours
-$paypal_email_address = 'paypal@yourdomain.com';  // your paypal email address
-$support_email_address = 'support@yourdomain.com';   // your email address for support
+$paypal_email_address = 'business@kengkawan.com';  // your paypal email address
+$support_email_address = 'dino@iszuddinismail.com';   // your email address for support
 $support_email_name = 'You - YourDomain.com';   // name to appear in the From when email is sent
 
 $get_shipping_address = 1;   // whether to get or not shipping address

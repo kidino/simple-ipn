@@ -18,7 +18,7 @@ $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 
 if ($_SERVER['QUERY_STRING'] == 'buy')
 {
-	$thankyou_page_url = str_replace($this_file, 'page.php?thankyou', $script_uri);
+	$thankyou_page_url = str_replace($this_file, 'thankyou.php', $script_uri);
     ?>
 <html><body <?php if ($debug != 1) { ?>onload="form1.submit()"<?php } ?>>
 <form name="form1" action="https://<?php echo $paypal_url ?>" method="post">
@@ -36,8 +36,7 @@ if ($_SERVER['QUERY_STRING'] == 'buy')
 
 <input type="hidden" name="no_shipping" value="<?php echo $no_shipping; ?>">
 	
-<?php if ($debug == 1) { ?><input type="hidden" name="return" value="<?php echo $script_uri; ?>">
-<?php } else { ?><input type="hidden" name="return" value="<?php echo $thankyou_page_url; ?>"><?php } ?>
+<input type="hidden" name="return" value="<?php echo $thankyou_page_url; ?>">
 
 <input type="hidden" name="notify_url" value="<?php echo $script_uri; ?>">
 <input type="hidden" name="no_note" value="1">
@@ -62,14 +61,14 @@ if ($_SERVER['QUERY_STRING'] == 'buy')
 
 
 // assign posted variables to local variables
-$item_name = $_POST['item_name'];
-$item_number = $_POST['item_number'];
-$payment_status = $_POST['payment_status'];
-$payment_amount = $_POST['mc_gross'];
-$payment_currency = $_POST['mc_currency'];
-$txn_id = $_POST['txn_id'];
-$receiver_email = $_POST['business'];
-$payer_email = $_POST['payer_email'];
+$item_name = $_REQUEST['item_name'];
+$item_number = $_REQUEST['item_number'];
+$payment_status = $_REQUEST['payment_status'];
+$payment_amount = $_REQUEST['mc_gross'];
+$payment_currency = $_REQUEST['mc_currency'];
+$txn_id = $_REQUEST['txn_id'];
+$receiver_email = $_REQUEST['business'];
+$payer_email = $_REQUEST['payer_email'];
 
 $download_page_url = str_replace($this_file, 'page.php?dl-'.$txn_id, $script_uri);
 
@@ -84,7 +83,7 @@ if ($debug == 1) {
 
 // read the post from PayPal system and add 'cmd'
 $req = 'cmd=_notify-validate';
-foreach ($_POST as $key => $value) {
+foreach ($_REQUEST as $key => $value) {
     $value = urlencode(stripslashes($value));
     $req .= "&$key=$value";
 }
@@ -114,7 +113,7 @@ else
 	    $ipn_log .= "Paypal IPN VERIFIED\n";
 	    if ($debug == 1) { fwrite($fpx, "Paypal IPN VERIFIED\n"); }
 
-	if (trim($receiver_email) == '') { $receiver_email = $_POST['receiver_email']; }
+	if (trim($receiver_email) == '') { $receiver_email = $_REQUEST['receiver_email']; }
 
 
 	$ipn_log .= "\nPRODUCT DETAILS CHECK\n";
@@ -144,16 +143,16 @@ else
 		$expire_date = time() + ($expire_in_hours * 60 * 60);
                 $ipx = create_download_file(
 			array(
-				'customer_name' => $_POST['first_name'].' '.$_POST['last_name'],
-				'business_name' => $_POST['payer_business_name'],
-				'customer_email' => $_POST['payer_email'],
-				'txn_id' => $_POST['txn_id'],
+				'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
+				'business_name' => $_REQUEST['payer_business_name'],
+				'customer_email' => $_REQUEST['payer_email'],
+				'txn_id' => $_REQUEST['txn_id'],
 				'expire_date' => $expire_date,
 				'expire_time' => $expire_in_hours,
-				'purchase_date' => $_POST['payment_date'],
+				'purchase_date' => $_REQUEST['payment_date'],
 				'purchase_amount' => $payment_amount,
 				'download_page_url' => $download_page_url,
-				'product_name' => $_POST['item_name']
+				'product_name' => $_REQUEST['item_name']
 			)
 		);
 		
@@ -164,10 +163,10 @@ else
 			array(
 				'from_email' => $support_email_address,
 				'from_email_name' => $support_email_name,
-				'customer_email' => $_POST['payer_email'],
+				'customer_email' => $_REQUEST['payer_email'],
 				'email_subject' => $email_subject,
 				'email_body' => $email_body,
-				'customer_name' => $_POST['first_name'].' '.$_POST['last_name'],
+				'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
 				'download_page' => $download_page_url,
 				'expire_in_hours' => $expire_in_hours,
 				'product_name' => $product_name,
@@ -198,7 +197,7 @@ else
 $ipn_log .= "\nPOST DATA\n";
 if ($debug == 1) { fwrite($fpx, "\nPOST DATA\n"); }
 
-foreach ($_POST as $key => $value)
+foreach ($_REQUEST as $key => $value)
 {
 	$ipn_log .= "$key: $value\n";
 	if ($debug == 1) { fwrite($fpx, "$key: $value\n"); }
