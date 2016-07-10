@@ -5,11 +5,11 @@ $this_file = "ipn.php";
 
 if ($paypal_sandbox == 1) {
 	$paypal_url = "www.sandbox.paypal.com/cgi-bin/webscr";
-	$paypal_ipn_url = "www.sandbox.paypal.com";
+	$paypal_ipn_url = "ipnpb.sandbox.paypal.com";
 }
 else {
 	$paypal_url = "www.paypal.com/cgi-bin/webscr";
-	$paypal_ipn_url = "www.paypal.com";
+	$paypal_ipn_url = "ipnpb.paypal.com";
 } 
 
 $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
@@ -81,6 +81,15 @@ if ($debug == 1) {
 	$ipn_log .= "DOWNLOAD PAGE: $download_page_url\n\n";
 }
 
+$ipn_log .= "\nPOST DATA\n";
+if ($debug == 1) { fwrite($fpx, "\nPOST DATA\n"); }
+
+foreach ($_REQUEST as $key => $value)
+{
+	$ipn_log .= "$key: $value\n";
+	if ($debug == 1) { fwrite($fpx, "$key: $value\n"); }
+}
+
 // read the post from PayPal system and add 'cmd'
 $req = 'cmd=_notify-validate';
 foreach ($_REQUEST as $key => $value) {
@@ -89,11 +98,15 @@ foreach ($_REQUEST as $key => $value) {
 }
 
 // post back to PayPal system to validate
-$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
+
+$header = "POST /cgi-bin/webscr HTTP/1.1\r\n";
 $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+$header .= "Host: ".$paypal_ipn_url."\r\n";
+$header .= "Connection: close\r\n";
 $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 
-$fp = fsockopen ($paypal_ipn_url, 80, $errno, $errstr, 30);
+$fp = fsockopen ('ssl://'.$paypal_ipn_url, 443, $errno, $errstr, 30);
+$fdata = '';
 
 if (!$fp)
 {
@@ -104,10 +117,14 @@ if (!$fp)
 }
 else
 {
+	
     fputs ($fp, $header . $req);
     while (!feof($fp))
     {
         $res = fgets ($fp, 1024);
+        $res = trim($res); //NEW & IMPORTANT
+		
+		$fdata .= $res."\r\n";
         if (strcmp ($res, "VERIFIED") == 0)
         {
 	    $ipn_log .= "Paypal IPN VERIFIED\n";
@@ -187,23 +204,19 @@ else
         else if (strcmp ($res, "INVALID") == 0)
         {
             print "<b>We cannot verify your purchase<br>";
-		$ipn_log .= "INVALID: We cannot verify your purchase\n";		
-		if ($debug == 1) { fwrite($fpx, "INVALID: We cannot verify your purchase\n"); }
-        }
+			$ipn_log .= "INVALID: We cannot verify your purchase\n";		
+			if ($debug == 1) { fwrite($fpx, "INVALID: We cannot verify your purchase\n"); }
+        } else {
+			$ipn_log .= "UNKNOWN ERROR: We cannot verify your purchase\n";		
+			if ($debug == 1) { fwrite($fpx, "UNKNOWN ERROR: We cannot verify your purchase\n"); }			
+		}
     }
     fclose ($fp);
 }
 
-$ipn_log .= "\nPOST DATA\n";
-if ($debug == 1) { fwrite($fpx, "\nPOST DATA\n"); }
-
-foreach ($_REQUEST as $key => $value)
-{
-	$ipn_log .= "$key: $value\n";
-	if ($debug == 1) { fwrite($fpx, "$key: $value\n"); }
-}
-
 if ($debug == 1) {
+	
+	fwrite($fpx, "\nFSOCK DATA----------\n$fdata\n");
 	fclose($fpx);
 	echo "<h3>Debug Mode. Here are IPN data and transaction result.</h3>\n";
 	echo "<pre>\n";
