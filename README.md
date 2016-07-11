@@ -1,49 +1,50 @@
 SIMPLE IPN
 ==========
 
-Some features:
+> WARNING: If you have an old version installed that does not support multiple products, this new version will not support the old download pages and transactions. I suggest that you install this new version in a new folder and leave your older version as is. This way, older download pages will still work if you have some recent sales.
+> 
+> When you have done that, update your sales page with new buy links so that newer sales will use the new version of Simple IPN.
 
-[+] Expiring download link
 
-[+] Expiring download page
+##Some features:
 
-[+] Minimum setup
+* Expiring download link
 
-[+] No database required
+* Expiring download page
 
-[+] Uses Paypal IPN
+* Minimum setup
 
-[+] Emails the customers with their download info
+* No database required
 
-[+] Customizable download page, thank you page and email
+* Uses Paypal IPN
 
-[+] Multiple files product package
+* Emails the customers with their download info
 
-[+] Allows Paypal Sandbox testing
+* Customizable download page, thank you page and email
 
-[+] Strict verification process - verifying price, paypal
-    email address and currency.
+* Multiple products
+
+* Multiple files product package
+
+* Allows Paypal Sandbox testing
+
+* IPN logging
+
+* Strict verification process - verifying price, paypal email address and currency.
 
 
 HOW TO USE / INSTALLATION
 =========================
 
-1 - Update settings.php with your products info and Paypal
-    details.
+1. Update settings.php with Paypal details.
 
-2 - Upload the files your chosen directory
+2. Update products.php with product and files information.
 
-3 - From your sales page, link your order button to:
+3. Upload the files your chosen directory.
 
-    ipn.php?buy
+4. From your sales page, link your order button to: ```ipn.php?buy={buycode01}```
 
-DONE!
-
-4 - Optionally, modify the template files to change the look
-    and feel of the download page and thank you page.
-
-5 - Optionally, send me $10 to remove the little ads credit
-    on the download page and thank you page.
+5. Optionally, modify the template files to change the look and feel of the download page and thank you page.
 
 
 FILES
@@ -56,6 +57,7 @@ FILES
 - tpl_tqpage.html       - thank you page template
 - tpl_dlpage.html       - download page template
 - functions.php         - functions required
+- products.php          - products & files information
 - style.css             - optional stylesheet
 
 - sample.pdf            - sample download file
@@ -155,18 +157,3 @@ example:
 You can use the ID's "dlist" and "expired" to style your
 download page with CSS.
 
-
-MULTIPLE PRODUCTS
-=================
-
-While Simple IPN can work with multiple files in your
-product package, Simple IPN is not designed to cater for
-multiple products.
-
-To use Simple IPN on your other products, copy the files of
-Simple IPN into a new folder and define your settings in the
-settings.php file.
-
-Just like how you previously link to ipn.php?buy, do the
-same for this new product. Make sure you link to the right
-file from the right folder.

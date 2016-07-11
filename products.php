@@ -1,8 +1,11 @@
 <?php
 
+// This is a big array of the products that you offer
+
 $products = array(
 	
 	// PRODUCT ARRAY KEY -- MAKE SURE THIS IS UNIQUE
+	// URL: ipn.php?buy=code01
 	'code01' => array(
 		'name' 		=> 'Sample Product 01',
 		'price'		=> 19.95,
@@ -25,6 +28,7 @@ $products = array(
 	),
 	
 	// SECOND PRODUCT
+	// URL: ipn.php?buy=code02
 	'code02' => array(
 		'name' 		=> 'Sample Product 02',
 		'price'		=> 97.00,
