@@ -1,5 +1,6 @@
 <?php
 include('settings.php');
+include('products.php');
 include('functions.php');
 $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 
@@ -17,6 +18,7 @@ $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 			"dl.php", 
 			"page.php", 
 			"settings.php", 
+			"products.php", 
 			"thankyou.php", 
 			"functions.php"
 		);
@@ -56,7 +58,12 @@ $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 				if ($dlvalue == 'DOWNLOADS1') $download_style = 1;
 				if ($dlvalue == 'DOWNLOADS2') $download_style = 2;
 	
-				$dl_list = display_products($product_files, $customer_info, $download_style, $dlmatches[2][$dlkey]);
+				$dl_list = display_products(
+					$products[$customer_info['product_code']]['files'], 
+					$customer_info, 
+					$download_style, 
+					$dlmatches[2][$dlkey]
+				);
 				$page_html = str_replace($dlmatches[0][$dlkey], $dl_list, $page_html);
 			}
 		}

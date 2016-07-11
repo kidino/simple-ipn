@@ -1,5 +1,6 @@
 <?php
 include('settings.php');
+include('products.php');
 include('functions.php');
 $this_file = "ipn.php";
 
@@ -16,53 +17,67 @@ $script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 
 // -- GENERATING THE PAYPAL ORDER BUTTON -- //
 
-if ($_SERVER['QUERY_STRING'] == 'buy')
+if (isset($_GET['buy']))
 {
-	$thankyou_page_url = str_replace($this_file, 'thankyou.php', $script_uri);
+	$product_code = $_GET['buy'];
+	if (isset($products[$product_code])) {
+		$product = $products[$product_code];
+		$thankyou_page_url = str_replace($this_file, 'thankyou.php', $script_uri);
     ?>
-<html><body <?php if ($debug != 1) { ?>onload="form1.submit()"<?php } ?>>
-<form name="form1" action="https://<?php echo $paypal_url ?>" method="post">
-<input type="hidden" name="cmd" value="_xclick">
-<input type="hidden" name="business" value="<?php echo $paypal_email_address; ?>">
-<input type="hidden" name="item_name" value="<?php echo $product_name; ?>">
-<input type="hidden" name="item_number" value="<?php echo $product_code; ?>">
-<input type="hidden" name="amount" value="<?php echo $product_price; ?>">
+	<html>
 
-<?php
+	<body <?php if ($debug !=1 ) { ?>onload="form1.submit()"
+		<?php } ?>>
+			<form name="form1" action="https://<?php echo $paypal_url ?>" method="post">
+				<input type="hidden" name="cmd" value="_xclick">
+				<input type="hidden" name="business" value="<?php echo $paypal_email_address; ?>">
+				<input type="hidden" name="item_name" value="<?php echo $product['name']; ?>">
+				<input type="hidden" name="item_number" value="<?php echo $product_code; ?>">
+				<input type="hidden" name="amount" value="<?php echo $product['price']; ?>">
+
+				<?php
 	if ($get_shipping_address == 1) { $no_shipping = 2; }
 	if ($get_shipping_address == 0) { $no_shipping = 1; }
 	if ($get_shipping_address == 2) { $no_shipping = 0; }
 ?>
 
-<input type="hidden" name="no_shipping" value="<?php echo $no_shipping; ?>">
-	
-<input type="hidden" name="return" value="<?php echo $thankyou_page_url; ?>">
+					<input type="hidden" name="no_shipping" value="<?php echo $no_shipping; ?>">
 
-<input type="hidden" name="notify_url" value="<?php echo $script_uri; ?>">
-<input type="hidden" name="no_note" value="1">
-<input type="hidden" name="currency_code" value="<?php echo $price_currency; ?>">
-<input type="hidden" name="rm" value="2">
+					<input type="hidden" name="return" value="<?php echo $thankyou_page_url; ?>">
 
-<?php if ($debug == 1) { ?>
-<h3 align="center">Debug Mode. View Source to See Paypal Button Form.</h3>
-<input type="submit" value="Click To Proceed To Paypal">
-<?php } ?>	
+					<input type="hidden" name="notify_url" value="<?php echo $script_uri; ?>">
+					<input type="hidden" name="no_note" value="1">
+					<input type="hidden" name="currency_code" value="<?php echo $product['currency']; ?>">
+					<input type="hidden" name="rm" value="2">
+
+					<?php if ($debug == 1) { ?>
+						<h3 align="center">Debug Mode. View Source to See Paypal Button Form.</h3>
+						<input type="submit" value="Click To Proceed To Paypal">
+						<?php } ?>
+
+			</form>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<?php if ($debug != 1) { ?>
+				<h3 align="center">Please wait while we transfer you to Paypal.</h3>
+				<?php } ?>
+
+					<body>
+
+	</html>
+	<?php
+	} else {
+		echo "<h1>Error : Product $product_code Not Found</h1>";
+	}
 	
-</form>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<?php if ($debug != 1) { ?><h3 align="center">Please wait while we transfer you to Paypal.</h3><?php } ?>
-<body>
-</html>
-<?php
     exit();
 }
 
 
 // assign posted variables to local variables
 $item_name = $_REQUEST['item_name'];
-$item_number = $_REQUEST['item_number'];
+$product_code = $item_number = $_REQUEST['item_number'];
 $payment_status = $_REQUEST['payment_status'];
 $payment_amount = $_REQUEST['mc_gross'];
 $payment_currency = $_REQUEST['mc_currency'];
@@ -72,22 +87,27 @@ $payer_email = $_REQUEST['payer_email'];
 
 $download_page_url = str_replace($this_file, 'page.php?dl-'.$txn_id, $script_uri);
 
-if ($debug == 1) {
-	$fpx = fopen('ipnlog.txt', 'a');
-	fwrite($fpx, "===================================\n");
-	fwrite($fpx, "DOWNLOAD PAGE: $download_page_url\n\n");
-	
-	$ipn_log .= "===================================\n";
-	$ipn_log .= "DOWNLOAD PAGE: $download_page_url\n\n";
+$ipn_log = '';
+
+if (filesize('ipnlog.txt') > 1000000) {
+	rename('ipnlog.txt', 'ipnlog-'.date('YmdHis').'.txt');
 }
 
-$ipn_log .= "\nPOST DATA\n";
-if ($debug == 1) { fwrite($fpx, "\nPOST DATA\n"); }
+$fpx = fopen('ipnlog.txt', 'a');
+debug_log("===================================\nDOWNLOAD PAGE: $download_page_url", $ipn_log, $fpx);
+debug_log("\nPOST DATA", $ipn_log, $fpx);
+
+$product_found = false;
+if (isset($products[$product_code])) {
+	$product = $products[$product_code];
+	$product_found = true;	
+} else {
+	debug_log("\nERROR -- PRODUCT NOT FOUND IN products.php -- $product_code", $ipn_log, $fpx);
+}
 
 foreach ($_REQUEST as $key => $value)
 {
-	$ipn_log .= "$key: $value\n";
-	if ($debug == 1) { fwrite($fpx, "$key: $value\n"); }
+	debug_log("$key => $value", $ipn_log, $fpx);
 }
 
 // read the post from PayPal system and add 'cmd'
@@ -110,10 +130,7 @@ $fdata = '';
 
 if (!$fp)
 {
-    print "<b>Error Communicating with Paypal.<br>";
-    $ipn_log .= "Error connecting to Paypal\n";
-    if ($debug == 1) { fwrite($fpx, "Error connecting to Paypal\n"); }
-
+	debug_log("\nFSOCKOPEN: Error connecting to Paypal", $ipn_log, $fpx);		
 }
 else
 {
@@ -127,100 +144,87 @@ else
 		$fdata .= $res."\r\n";
         if (strcmp ($res, "VERIFIED") == 0)
         {
-	    $ipn_log .= "Paypal IPN VERIFIED\n";
-	    if ($debug == 1) { fwrite($fpx, "Paypal IPN VERIFIED\n"); }
+			debug_log("\nPAYPAL IPN VERIFIED", $ipn_log, $fpx);		
 
-	if (trim($receiver_email) == '') { $receiver_email = $_REQUEST['receiver_email']; }
+			if (trim($receiver_email) == '') { $receiver_email = $_REQUEST['receiver_email']; }
 
+			if ($product_found) {
+				debug_log("\nPRODUCT DETAILS CHECK", $ipn_log, $fpx);		
+				debug_log("|$receiver_email| : |$paypal_email_address|", $ipn_log, $fpx);		
+				debug_log("|$payment_amount| : |$product[price]|", $ipn_log, $fpx);		
+				debug_log("|$payment_currency| : |$product[currency]|", $ipn_log, $fpx);		
+				debug_log("|$payment_status| : |Completed|", $ipn_log, $fpx);		
 
-	$ipn_log .= "\nPRODUCT DETAILS CHECK\n";
-	$ipn_log .= "|$receiver_email| : |$paypal_email_address|\n";
-	$ipn_log .= "|$payment_amount| : |$product_price|\n";
-	$ipn_log .= "|$payment_currency| : |$price_currency\n";
-	$ipn_log .= "|$payment_status| : |Completed|\n\n";
+				if (
+					(strtolower($receiver_email) == strtolower($paypal_email_address)) &&
+					($payment_amount == $product['price']) &&
+					($payment_currency == $product['currency']) &&
+					(($payment_status == 'Completed') || ($payment_status == 'Pending'))
+				) {
+					debug_log("Paypal IPN DATA OK", $ipn_log, $fpx);		
 
-	if ($debug == 1) {
-		fwrite($fpx, "\nPRODUCT DETAILS CHECK\n");
-		fwrite($fpx, "|$receiver_email| : |$paypal_email_address|\n");
-		fwrite($fpx, "|$payment_amount| : |$product_price|\n");
-		fwrite($fpx, "|$payment_currency| : |$price_currency|\n");
-		fwrite($fpx, "|$payment_status| : |Completed|\n\n");
-	}
-	
+					$expire_date = time() + ($expire_in_hours * 60 * 60);
+					$ipx = create_download_file(
+						array(
+							'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
+							'business_name' => $_REQUEST['payer_business_name'],
+							'customer_email' => $_REQUEST['payer_email'],
+							'txn_id' => $_REQUEST['txn_id'],
+							'expire_date' => $expire_date,
+							'expire_time' => $expire_in_hours,
+							'purchase_date' => $_REQUEST['payment_date'],
+							'purchase_amount' => $payment_amount,
+							'download_page_url' => $download_page_url,
+							'product_name' => $_REQUEST['item_name'],
+							'product_code' => $product_code,
+							'status' => $payment_status
+						)
+					);
 
-            if (
-                ($receiver_email == $paypal_email_address) &&
-                ($payment_amount == $product_price) &&
-		($payment_currency == $price_currency) &&
-		($payment_status == 'Completed')
-            ) {
-		$ipn_log .= "Paypal IPN DATA OK\n";
-		if ($debug == 1) { fwrite($fpx, "Paypal IPN DATA OK\n"); }
-		
-		$expire_date = time() + ($expire_in_hours * 60 * 60);
-                $ipx = create_download_file(
-			array(
-				'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
-				'business_name' => $_REQUEST['payer_business_name'],
-				'customer_email' => $_REQUEST['payer_email'],
-				'txn_id' => $_REQUEST['txn_id'],
-				'expire_date' => $expire_date,
-				'expire_time' => $expire_in_hours,
-				'purchase_date' => $_REQUEST['payment_date'],
-				'purchase_amount' => $payment_amount,
-				'download_page_url' => $download_page_url,
-				'product_name' => $_REQUEST['item_name']
-			)
-		);
-		
-		$ipn_log .= $ipx;
-		if ($debug == 1) { fwrite($fpx, "$ipx\n"); }
+					debug_log("\nCREATE DOWNLOAD FILE\n$ipx", $ipn_log, $fpx);								
 
-		$ipx = send_customer_email(
-			array(
-				'from_email' => $support_email_address,
-				'from_email_name' => $support_email_name,
-				'customer_email' => $_REQUEST['payer_email'],
-				'email_subject' => $email_subject,
-				'email_body' => $email_body,
-				'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
-				'download_page' => $download_page_url,
-				'expire_in_hours' => $expire_in_hours,
-				'product_name' => $product_name,
-				'product_code' => $product_code,
-				'expire_in_hours' => $expire_in_hours
-			)
-		);
-		
-		$ipn_log .= $ipx;
-		if ($debug == 1) { fwrite($fpx, "$ipx\n"); }
+					$ipx = send_customer_email(
+						array(
+							'from_email' => $support_email_address,
+							'from_email_name' => $support_email_name,
+							'customer_email' => $_REQUEST['payer_email'],
+							'email_subject' => $email_subject,
+							'email_body' => $email_body,
+							'customer_name' => $_REQUEST['first_name'].' '.$_REQUEST['last_name'],
+							'download_page' => $download_page_url,
+							'expire_in_hours' => $expire_in_hours,
+							'product_name' => $product['name'],
+							'product_code' => $product_code,
+							'expire_in_hours' => $expire_in_hours
+						)
+					);
 
-            } else {
-                print "<b>Purchase does not match product details.<br>";
-		$ipn_log .= "Purchase does not match product details\n";
-		if ($debug == 1) { fwrite($fpx, "Purchase does not match product details\n"); }
-            }
-        }
-        else if (strcmp ($res, "INVALID") == 0)
-        {
-            print "<b>We cannot verify your purchase<br>";
-			$ipn_log .= "INVALID: We cannot verify your purchase\n";		
-			if ($debug == 1) { fwrite($fpx, "INVALID: We cannot verify your purchase\n"); }
+					debug_log("\nSEND CUSTOMER EMAIL\n$ipx", $ipn_log, $fpx);								
+
+				} else {
+					debug_log("\nPurchase does not match product details", $ipn_log, $fpx);	
+				}
+			} else {
+				debug_log("ERROR: Paypal IPN verified by product not found", $ipn_log, $fpx);			
+			}
+		} else if (strcmp ($res, "INVALID") == 0) {
+			debug_log("INVALID: We cannot verify your purchase", $ipn_log, $fpx);			
         } else {
-			$ipn_log .= "UNKNOWN ERROR: We cannot verify your purchase\n";		
-			if ($debug == 1) { fwrite($fpx, "UNKNOWN ERROR: We cannot verify your purchase\n"); }			
+			debug_log("UNKNOWN ERROR: We cannot verify your purchase", $ipn_log, $fpx);			
 		}
     }
     fclose ($fp);
 }
 
+debug_log("fsockopen data:\n$fdata", $ipn_log, $fpx);			
+
 if ($debug == 1) {
-	
-	fwrite($fpx, "\nFSOCK DATA----------\n$fdata\n");
-	fclose($fpx);
 	echo "<h3>Debug Mode. Here are IPN data and transaction result.</h3>\n";
 	echo "<pre>\n";
 	echo $ipn_log;
 	echo "</pre>\n";
 }
+
+fclose($fpx);
+
 ?>

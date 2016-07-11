@@ -1,6 +1,6 @@
 <?php
 
-$product = array(
+$products = array(
 	
 	// PRODUCT ARRAY KEY -- MAKE SURE THIS IS UNIQUE
 	'code01' => array(

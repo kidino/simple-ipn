@@ -5,7 +5,7 @@ function download_is_expired($expire_time) {
     else { return true; }
 }
 
-function display_products($products, $customer_info, $list_style=1, $expired_message) {
+function display_products($product_files, $customer_info, $list_style=1, $expired_message) {
 	$txn_id = $customer_info['txn_id'];
 	if (download_is_expired($customer_info['expire_date']))
 	{
@@ -14,13 +14,17 @@ function display_products($products, $customer_info, $list_style=1, $expired_mes
 	}
 	else
 	{
+		if ($customer_info['status'] == 'Completed') {
 		$download_list = "<ul id='dlist'>\n";
-	        foreach($products as $id => $product)
+	        foreach($product_files as $id => $product)
 	        {
 			if ($list_style == 1) { $download_list .= "<li>$product[name] <small>[ <a href='dl.php?id=$txn_id&file=$id'>DOWNLOAD</a> ]</small></li>\n"; }
 			else  { $download_list .= "<li><a href='dl.php?id=$txn_id&file=$id'>$product[name]</a></li>\n"; }
 		}
 		$download_list .= "</ul>";
+		} else {
+			$download_list = "<p id='pending'>Your order is marked Pending. It will be updated once it is marked Completed by Paypal</p>";
+		}
 	}
 	return $download_list;
 }
@@ -36,8 +40,10 @@ $file_content .= "	'purchase_amount'  => $file_data[purchase_amount],\n";
 $file_content .= "	'purchase_date'  => '$file_data[purchase_date]',\n";
 $file_content .= "	'download_page_url'  => '$file_data[download_page_url]',\n";
 $file_content .= "	'expire_date'    => $file_data[expire_date],\n";
-$file_content .= "	'expire_time'    => $file_data[expire_time],\n";
-$file_content .= "	'product_name'    => '".addslashes($file_data['product_name'])."'\n";
+$file_content .= "	'expire_time'    => $file_data[expire_time], // update to future timestamp to extend download\n";
+$file_content .= "	'product_name'    => '".addslashes($file_data['product_name'])."',\n";
+$file_content .= "	'status'    => '".$file_data['status']."', // if Pending, update to Completed when transaction completed\n";
+$file_content .= "	'product_code'    => '".addslashes($file_data['product_code'])."'\n";
 $file_content .= ");\n\n";
 
 $file_content .= "\$customer_info['time_left'] = sprintf(\"%.2f\",(\$customer_info['expire_date'] - time()) / 3600);\n\n";
@@ -108,5 +114,10 @@ function what_is_my_site() {
         $mysite .= $path;
     }
     return($mysite);
+}
+
+function debug_log($msg, &$imsg, $fpx) {
+	$imsg .= "$msg\n";
+	fwrite($fpx, $msg);
 }
 ?>

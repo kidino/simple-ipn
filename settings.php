@@ -15,30 +15,6 @@ $get_shipping_address = 1;   // whether to get or not shipping address
                              // 0 - No, shipping address field removed
                              // 2 - Optional, shipping address is optional
 
-$product_name = 'Sample Product';   // Product name, will appear in Paypal
-$product_code = 'SPL101';   // Code, will appear in Paypal
-$product_price = '19.95';   // product price, will appear in Paypal
-$price_currency = 'USD';    // currency, Paypal only supports
-                            // AUD CAD EUR GBP JPY USD NZD CHF HKD
-                            // SGD SEK DKK PLN NOK HUF CZK ILS MXN
- 
-$product_files = array(); // do not change
-
-$product_files[] = array( // DEFINE YOUR PRODUCT
-		'name'     => 'Sample Audio MP3', // normal name of the file
-		'filename' => 'audio-lesson.mp3', // filename the customer will gets
-		'source'   => 'sample.mp3'        // actual location of the file
-                                                  // does not need to be the same filename
-                                                  // location can elsewhere too like:
-                                                  // 'source'   => '../../store/sample.mp3'
-	);
-
-$product_files[] = array( // DEFINE ANOTHER PRODUCT
-		'name'     => 'Sample PDF eBook',
-		'filename' => 'workbook.pdf',
-		'source'   => 'sample.pdf'
-	);
-
 $email_subject = 'Your Purchase: {PRODUCT NAME} ({PRODUCT CODE})'; // subject line for your email
 
 // email body. you cannot have anything, even blank spaces after EOT

@@ -1,6 +1,7 @@
 <?php
 set_time_limit(0);
 include('settings.php');
+include('products.php');
 include('functions.php');
 include_once('downloader.inc.php');
 
@@ -10,6 +11,7 @@ $no_files = array(
 	"dl.php", 
 	"page.php", 
 	"settings.php", 
+	"products.php", 
 	"functions.php"
 );
 
@@ -30,10 +32,10 @@ else
 
 $file_id = (int) $_GET['file'];
 
-if (!isset($product_files[$file_id]))
+if (!isset($products[$customer_info['product_code']]['files'][$file_id]))
 { die('Invalid File Information. Contact Administrator.'); }
 
-$file = $product_files[$file_id];
+$file = $products[$customer_info['product_code']]['files'][$file_id];
 
 if (download_is_expired($customer_info['expire_date']))
 { die('Download has expired.'); }
